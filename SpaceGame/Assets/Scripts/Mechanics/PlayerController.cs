@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Platformer.Gameplay;
@@ -14,38 +15,26 @@ namespace Platformer.Mechanics
     /// </summary>
     public class PlayerController : KinematicObject
     {
-        public AudioClip jumpAudio;
-        public AudioClip respawnAudio;
-        public AudioClip ouchAudio;
-
         /// <summary>
         /// Max horizontal speed of the player.
         /// </summary>
         public float maxSpeed = 7;
-        /// <summary>
-        /// Initial jump velocity at the start of a jump.
-        /// </summary>
-        public float jumpTakeOffSpeed = 7;
-
-        public JumpState jumpState = JumpState.Grounded;
-        private bool stopJump;
+        
         /*internal new*/ public Collider2D collider2d;
-        /*internal new*/ public AudioSource audioSource;
         public Health health;
         public bool controlEnabled = true;
 
-        bool jump;
         Vector2 move;
         SpriteRenderer spriteRenderer;
         internal Animator animator;
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
 
         public Bounds Bounds => collider2d.bounds;
-
+        public Vector2 thrust = Vector2.zero;
+        
         void Awake()
         {
             health = GetComponent<Health>();
-            audioSource = GetComponent<AudioSource>();
             collider2d = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
@@ -55,69 +44,37 @@ namespace Platformer.Mechanics
         {
             if (controlEnabled)
             {
-                move.x = Input.GetAxis("Horizontal");
-                if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
-                    jumpState = JumpState.PrepareToJump;
-                else if (Input.GetButtonUp("Jump"))
+                var rotationRad = (body.rotation + (Mathf.PI / 2)) * (Mathf.PI/180);
+                //sin and cos are flipped because our origin is verticle
+                var xFactor = -Mathf.Sin(rotationRad);
+                var yFactor = Mathf.Cos(rotationRad);
+                thrust = new Vector2(xFactor,yFactor) * Input.GetAxis("Vertical");
+                var rotationSpeed = -Input.GetAxis("Horizontal");
+
+                if (body.angularVelocity != 0)
                 {
-                    stopJump = true;
-                    Schedule<PlayerStopJump>().player = this;
+                    int x = 0;
                 }
+
+                if (rotationSpeed != 0)
+                {
+                    int x = 0;
+                }
+                
+                body.rotation += rotationSpeed* 100* Time.deltaTime;
+                //body.AddTorque(rotationSpeed*1000* Time.deltaTime, ForceMode2D.Force);
+                body.position += thrust * (10f * Time.deltaTime);
             }
             else
             {
                 move.x = 0;
+                move.y = 0;
             }
-            UpdateJumpState();
             base.Update();
-        }
-
-        void UpdateJumpState()
-        {
-            jump = false;
-            switch (jumpState)
-            {
-                case JumpState.PrepareToJump:
-                    jumpState = JumpState.Jumping;
-                    jump = true;
-                    stopJump = false;
-                    break;
-                case JumpState.Jumping:
-                    if (!IsGrounded)
-                    {
-                        Schedule<PlayerJumped>().player = this;
-                        jumpState = JumpState.InFlight;
-                    }
-                    break;
-                case JumpState.InFlight:
-                    if (IsGrounded)
-                    {
-                        Schedule<PlayerLanded>().player = this;
-                        jumpState = JumpState.Landed;
-                    }
-                    break;
-                case JumpState.Landed:
-                    jumpState = JumpState.Grounded;
-                    break;
-            }
         }
 
         protected override void ComputeVelocity()
         {
-            if (jump && IsGrounded)
-            {
-                velocity.y = jumpTakeOffSpeed * model.jumpModifier;
-                jump = false;
-            }
-            else if (stopJump)
-            {
-                stopJump = false;
-                if (velocity.y > 0)
-                {
-                    velocity.y = velocity.y * model.jumpDeceleration;
-                }
-            }
-
             if (move.x > 0.01f)
                 spriteRenderer.flipX = false;
             else if (move.x < -0.01f)
@@ -127,15 +84,6 @@ namespace Platformer.Mechanics
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
             targetVelocity = move * maxSpeed;
-        }
-
-        public enum JumpState
-        {
-            Grounded,
-            PrepareToJump,
-            Jumping,
-            InFlight,
-            Landed
         }
     }
 }
