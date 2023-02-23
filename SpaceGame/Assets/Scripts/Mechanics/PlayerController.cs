@@ -49,18 +49,10 @@ namespace Platformer.Mechanics
                 var xFactor = -Mathf.Sin(rotationRad);
                 var yFactor = Mathf.Cos(rotationRad);
                 thrust = new Vector2(xFactor,yFactor) * Input.GetAxis("Vertical");
+                
+                //invert horizontal axis because it feels more natural
                 var rotationSpeed = -Input.GetAxis("Horizontal");
 
-                if (body.angularVelocity != 0)
-                {
-                    int x = 0;
-                }
-
-                if (rotationSpeed != 0)
-                {
-                    int x = 0;
-                }
-                
                 body.rotation += rotationSpeed* 100* Time.deltaTime;
                 //body.AddTorque(rotationSpeed*1000* Time.deltaTime, ForceMode2D.Force);
                 body.position += thrust * (10f * Time.deltaTime);
