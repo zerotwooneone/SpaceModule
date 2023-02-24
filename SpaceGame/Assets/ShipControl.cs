@@ -17,20 +17,18 @@ public class ShipControl : MonoBehaviour
         {
             Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (_rigidbody2D.velocity),DebugVelocity.Value);
         }
+        if (DebugUp != null)
+        {
+            Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + ((Vector2)_rigidbody2D.transform.up),DebugUp.Value);    
+        }
     }
 
     private Color? DebugVelocity = Color.blue;
     private Color? DebugUp;
-    private Color? DebugThrustDir = Color.red;
+    private Color? DebugThrustDir;
     
     private void FixedUpdate()
     {
-        if (DebugUp != null)
-        {
-            Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Vector2.up),DebugUp.Value);    
-        }
-        
-        
         var rotationRad = (_rigidbody2D.rotation ) * (Mathf.PI/180f);
         if (Mathf.Approximately(rotationRad, 0))
         {
