@@ -32,14 +32,14 @@ public class ShipControl : MonoBehaviour
             xFactor = 0;
         }
         var yFactor = Mathf.Cos(rotationRad);
-        Thrust = new Vector2(xFactor,yFactor) * Input.GetAxis("Vertical");
+        Thrust = new Vector2(xFactor,yFactor) * (Input.GetAxis("Vertical") * (2f*_rigidbody2D.mass));
         
         Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Thrust * 15),Color.red);
                 
         //invert horizontal axis because it feels more natural
-        var rotationSpeed = -Input.GetAxis("Horizontal");
+        var rotationSpeed = -Input.GetAxis("Horizontal") * (_rigidbody2D.mass/20f);
 
         _rigidbody2D.AddTorque(rotationSpeed, ForceMode2D.Force);
-        _rigidbody2D.AddForce(Thrust * (2f*_rigidbody2D.mass));
+        _rigidbody2D.AddForce(Thrust );
     }
 }
