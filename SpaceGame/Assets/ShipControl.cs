@@ -21,11 +21,17 @@ public class ShipControl : MonoBehaviour
         {
             Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + ((Vector2)_rigidbody2D.transform.up),DebugUp.Value);    
         }
+
+        if (DebugRotateInput != null)
+        {
+            Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (-Input.GetAxis("Horizontal")*Vector2.right),DebugRotateInput.Value);
+        }
     }
 
     private Color? DebugVelocity = Color.blue;
     private Color? DebugUp;
-    private Color? DebugThrustDir;
+    private Color? DebugThrustDir = Color.red;
+    private Color? DebugRotateInput = Color.red;
     
     private void FixedUpdate()
     {
