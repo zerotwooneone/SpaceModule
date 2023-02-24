@@ -18,7 +18,9 @@ public class ShipControl : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var rotationRad = (_rigidbody2D.rotation + (Mathf.PI / 2f)) * (Mathf.PI/180f);
+        Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Vector2.up * 15),Color.green);
+        
+        var rotationRad = (_rigidbody2D.rotation ) * (Mathf.PI/180f);
         if (Mathf.Approximately(rotationRad, 0))
         {
             rotationRad = 0;
@@ -31,6 +33,8 @@ public class ShipControl : MonoBehaviour
         }
         var yFactor = Mathf.Cos(rotationRad);
         Thrust = new Vector2(xFactor,yFactor) * Input.GetAxis("Vertical");
+        
+        Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Thrust * 15),Color.red);
                 
         //invert horizontal axis because it feels more natural
         var rotationSpeed = -Input.GetAxis("Horizontal");
