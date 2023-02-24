@@ -44,18 +44,7 @@ namespace Platformer.Mechanics
         {
             if (controlEnabled)
             {
-                var rotationRad = (body.rotation + (Mathf.PI / 2)) * (Mathf.PI/180);
-                //sin and cos are flipped because our origin is verticle
-                var xFactor = -Mathf.Sin(rotationRad);
-                var yFactor = Mathf.Cos(rotationRad);
-                thrust = new Vector2(xFactor,yFactor) * Input.GetAxis("Vertical");
                 
-                //invert horizontal axis because it feels more natural
-                var rotationSpeed = -Input.GetAxis("Horizontal");
-
-                body.rotation += rotationSpeed* 100* Time.deltaTime;
-                //body.AddTorque(rotationSpeed*1000* Time.deltaTime, ForceMode2D.Force);
-                body.position += thrust * (10f * Time.deltaTime);
             }
             else
             {
