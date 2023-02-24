@@ -13,12 +13,23 @@ public class ShipControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (DebugVelocity != null)
+        {
+            Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (_rigidbody2D.velocity),DebugVelocity.Value);
+        }
     }
 
+    private Color? DebugVelocity = Color.blue;
+    private Color? DebugUp;
+    private Color? DebugThrustDir = Color.red;
+    
     private void FixedUpdate()
     {
-        Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Vector2.up * 15),Color.green);
+        if (DebugUp != null)
+        {
+            Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Vector2.up),DebugUp.Value);    
+        }
+        
         
         var rotationRad = (_rigidbody2D.rotation ) * (Mathf.PI/180f);
         if (Mathf.Approximately(rotationRad, 0))
@@ -32,10 +43,15 @@ public class ShipControl : MonoBehaviour
             xFactor = 0;
         }
         var yFactor = Mathf.Cos(rotationRad);
-        Thrust = new Vector2(xFactor,yFactor) * (Input.GetAxis("Vertical") * (2f*_rigidbody2D.mass));
-        
-        Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (Thrust * 15),Color.red);
-                
+        var thrustDirection = new Vector2(xFactor,yFactor);
+        var thrustInput = Input.GetAxis("Vertical");
+        Thrust = thrustDirection * (thrustInput * (2f*_rigidbody2D.mass));
+
+        if (DebugThrustDir != null)
+        {
+            Debug.DrawLine(_rigidbody2D.position, _rigidbody2D.position + (thrustInput*thrustDirection),DebugThrustDir.Value);    
+        }
+
         //invert horizontal axis because it feels more natural
         var rotationSpeed = -Input.GetAxis("Horizontal") * (_rigidbody2D.mass/20f);
 
